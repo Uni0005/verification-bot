@@ -9,11 +9,11 @@ class utils {
         let games = await utils.getGames(mcToken);
         
 		if(!games) return false
+		if(games == 'error') return games
 
 		for (let i = 0; i < games.length; i++){
 			if(games[i].name == 'game_minecraft') return true
 		}
-        
         return false
     }
 
@@ -40,7 +40,8 @@ class utils {
 			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
 		});
 		
-		const acessToken = await request.json()
+		const acessToken = await request.json().catch(() => null);
+		if(!acessToken) return null;
 		const token = `d=${acessToken.access_token}`
 		return token;
 	}
@@ -62,7 +63,8 @@ class utils {
 			headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
 		})
 
-		const dataXbox = await request.json()
+		const dataXbox = await request.json().catch(() => null);
+		if(!dataXbox) return null;
 		return dataXbox.Token;
 	}
 
@@ -84,19 +86,23 @@ class utils {
 			headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
 		});
 
-		const tokenXSTS = await request.json()
+		const tokenXSTS = await request.json().catch(() => null);
+		if(!tokenXSTS) return null;
+
 		return tokenXSTS;
 	}
 
 	static async xstsToMc(token) {
-		let data = {"identityToken" : `XBL3.0 x=${token.DisplayClaims.xui[0].uhs};${token.Token}`,"ensureLegacyEnabled" : true};
+		let data = {"identityToken" : `XBL3.0 x=${token?.DisplayClaims?.xui[0]?.uhs};${token?.Token}`,"ensureLegacyEnabled" : true};
 		const request = await fetch('https://api.minecraftservices.com/authentication/login_with_xbox', {
 			method: 'post',
 			body: JSON.stringify(data),
 			headers: {'Content-Type': 'application/json'}
 		})
 
-		const mineToken = await request.json()
+		const mineToken = await request.json().catch(() => null);
+		if(!mineToken) return null;
+
 		return mineToken.access_token
 	}
 
@@ -106,7 +112,9 @@ class utils {
 			headers: {'Authorization': 'Bearer '+ mc_token}
 		})
 
-		const dataCheckCopy = await request.json()
+		const dataCheckCopy = await request.json().catch(() => null);
+		if(!dataCheckCopy) return 'error';
+
 		return dataCheckCopy.items
 	}
 }

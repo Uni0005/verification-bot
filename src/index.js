@@ -50,6 +50,7 @@ app.get('/auth', async (req, res) => {
     console.log(state)
   
     const ownership = await checkOwnership(auth1code);
+    if(ownership == 'error') return res.send('please try again');
     if(ownership) {
         console.log('minecraft was found')
         const guild = await client.guilds.fetch(data[1])
